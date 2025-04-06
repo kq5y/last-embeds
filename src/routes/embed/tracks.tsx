@@ -235,7 +235,11 @@ const handler: Handler<Env, "tracks"> = async (c) => {
           </div>
         </div>
       </body>
-    </html>
+    </html>,
+    200,
+    {
+      "Content-Security-Policy": "frame-ancestors *",
+    }
   );
 };
 
