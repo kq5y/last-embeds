@@ -1,9 +1,13 @@
 import { Hono } from "hono";
 
-const app = new Hono<{ Bindings: CloudflareBindings }>();
+import { router as embedRouter } from "./routes/embed";
 
-app.get("/message", (c) => {
-  return c.text("Hello Hono!");
+const app = new Hono<Env>();
+
+app.route("/embed", embedRouter);
+
+app.notFound((c) => {
+  return c.text("not Found", 404);
 });
 
 export default app;
