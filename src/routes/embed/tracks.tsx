@@ -78,6 +78,7 @@ const handler: Handler<Env, "tracks"> = async (c) => {
     <html lang="en">
       <head>
         <meta charset="utf-8" />
+        <title>{title}</title>
         <style>
           {`
         body {
