@@ -7,7 +7,7 @@ const app = new Hono<Env>();
 app.route("/embed", embedRouter);
 
 app.notFound((c) => {
-  return c.text("not Found", 404);
+  return c.text("not found", 404);
 });
 
 export default app;
