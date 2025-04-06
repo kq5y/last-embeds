@@ -4,6 +4,7 @@ import {
   type TrackItem,
   getRecentTracks,
   getTopTracks,
+  getTrackInfo,
   isPeriod,
 } from "@/libraries/lastfm";
 
@@ -24,6 +25,7 @@ const handler: Handler<Env, "tracks"> = async (c) => {
 
   let tracks: TrackItem[];
   let title: string;
+  let images: string[];
 
   if (type === "recently") {
     tracks = await getRecentTracks(
@@ -32,6 +34,7 @@ const handler: Handler<Env, "tracks"> = async (c) => {
       Number.parseInt(limit)
     );
     title = `Recently Played by ${user}`;
+    images = tracks.slice(0, 4).map((track) => track.image);
   } else if (type === "frequently") {
     if (!isPeriod(period)) {
       return c.text("invalid period", 400);
@@ -44,6 +47,29 @@ const handler: Handler<Env, "tracks"> = async (c) => {
       period
     );
     title = `Top Tracks by ${user}${period ? ` (${period})` : ""}`;
+
+    images = [];
+    for (const track of tracks) {
+      if (track.image.includes("2a96cbd8b46e442fc41c2b86b821562f")) {
+        const info = await getTrackInfo(
+          c.env.LASTFM_API_KEY,
+          track.name,
+          track.artist
+        );
+        if (info?.album) {
+          images.push(info.album.image[2]["#text"]);
+        } else {
+          images.push(
+            "https://lastfm.freetls.fastly.net/i/u/174s/2a96cbd8b46e442fc41c2b86b821562f.png"
+          );
+        }
+      } else {
+        images.push(track.image);
+      }
+      if (images.length >= 4) {
+        break;
+      }
+    }
   } else {
     return c.text("invalid type", 400);
   }
@@ -180,8 +206,8 @@ const handler: Handler<Env, "tracks"> = async (c) => {
       <body>
         <div className="embed-container">
           <div className="image-grid">
-            {tracks.slice(0, 4).map((track, i) => (
-              <img key={i} src={track.image} alt="thumbnail" />
+            {images.map((image, i) => (
+              <img key={i} src={image} alt="thumbnail" />
             ))}
           </div>
           <div className="content">
