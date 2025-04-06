@@ -88,12 +88,17 @@ export function isPeriod(period: string): period is Period {
   );
 }
 
-export interface TrackItem {
+interface TrackItemBase {
   name: string;
   artist: string;
   image: string;
   url: string;
+}
+export interface RecentTrackItem extends TrackItemBase {
   nowplaying: boolean;
+}
+export interface TopTrackItem extends TrackItemBase {
+  playcount: number;
 }
 
 export async function getTrackInfo(
@@ -121,7 +126,7 @@ export async function getRecentTracks(
   apiKey: string,
   user: string,
   limit: number
-): Promise<TrackItem[]> {
+): Promise<RecentTrackItem[]> {
   const url = new URL("https://ws.audioscrobbler.com/2.0/");
   url.searchParams.set("method", "user.getrecenttracks");
   url.searchParams.set("user", user);
@@ -134,7 +139,7 @@ export async function getRecentTracks(
   return data.recenttracks.track.map((track) => ({
     name: track.name,
     artist: track.artist["#text"],
-    image: track.image[2]["#text"],
+    image: track.image[1]["#text"],
     url: track.url,
     nowplaying: !!track["@attr"]?.nowplaying,
   }));
@@ -145,7 +150,7 @@ export async function getTopTracks(
   user: string,
   limit: number,
   period: Period
-): Promise<TrackItem[]> {
+): Promise<TopTrackItem[]> {
   const url = new URL("https://ws.audioscrobbler.com/2.0/");
   url.searchParams.set("method", "user.gettoptracks");
   url.searchParams.set("user", user);
@@ -159,8 +164,8 @@ export async function getTopTracks(
   return data.toptracks.track.map((track) => ({
     name: track.name,
     artist: track.artist.name,
-    image: track.image[2]["#text"],
+    image: track.image[1]["#text"],
     url: track.url,
-    nowplaying: false,
+    playcount: Number.parseInt(track.playcount),
   }));
 }

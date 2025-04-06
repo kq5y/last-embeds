@@ -1,7 +1,8 @@
 import type { Handler } from "hono";
 
 import {
-  type TrackItem,
+  type RecentTrackItem,
+  type TopTrackItem,
   getRecentTracks,
   getTopTracks,
   getTrackInfo,
@@ -23,16 +24,16 @@ const handler: Handler<Env, "tracks"> = async (c) => {
     return c.text("invalid limit", 400);
   }
 
-  let tracks: TrackItem[];
+  let tracks: RecentTrackItem[] | TopTrackItem[];
   let title: string;
   let images: string[];
 
   if (type === "recently") {
-    tracks = await getRecentTracks(
+    tracks = (await getRecentTracks(
       c.env.LASTFM_API_KEY,
       user,
       Number.parseInt(limit)
-    );
+    )) as RecentTrackItem[];
     title = `Recently Played by ${user}`;
     images = tracks.slice(0, 4).map((track) => track.image);
   } else if (type === "frequently") {
@@ -57,7 +58,7 @@ const handler: Handler<Env, "tracks"> = async (c) => {
           track.artist
         );
         if (info?.album) {
-          images.push(info.album.image[2]["#text"]);
+          images.push(info.album.image[1]["#text"]);
         } else {
           images.push(
             "https://lastfm.freetls.fastly.net/i/u/174s/2a96cbd8b46e442fc41c2b86b821562f.png"
@@ -154,6 +155,7 @@ const handler: Handler<Env, "tracks"> = async (c) => {
           margin-bottom: 0.3rem;
           transition: background-color 0.3s ease;
           border-radius: 0.4rem;
+          cursor: default;
         }
 
         .track-index {
@@ -166,6 +168,7 @@ const handler: Handler<Env, "tracks"> = async (c) => {
           align-items: center;
           gap: 0.5rem;
           overflow: hidden;
+          padding-right: 0.5rem;
         }
 
         .track-info h3,
@@ -187,6 +190,10 @@ const handler: Handler<Env, "tracks"> = async (c) => {
           font-size: 0.8rem;
           color: #aaa;
           flex: 1 1 40%;
+        }
+
+        .track-info span:last-child {
+          flex: initial;
         }
 
         a {
@@ -227,6 +234,13 @@ const handler: Handler<Env, "tracks"> = async (c) => {
                         <h3>{track.name}</h3>
                       </a>
                       <span>{track.artist}</span>
+                      {type === "recently" &&
+                        (track as RecentTrackItem).nowplaying && (
+                          <span>Now Playing...</span>
+                        )}
+                      {type === "frequently" && (
+                        <span>{(track as TopTrackItem).playcount} times</span>
+                      )}
                     </div>
                   </li>
                 ))}
