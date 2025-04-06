@@ -74,7 +74,7 @@ const handler: Handler<Env, "tracks"> = async (c) => {
     return c.text("invalid type", 400);
   }
 
-  return c.html(
+  const response = await c.html(
     <html lang="en">
       <head>
         <meta charset="utf-8" />
@@ -241,6 +241,9 @@ const handler: Handler<Env, "tracks"> = async (c) => {
       "Content-Security-Policy": "frame-ancestors *",
     }
   );
+  response.headers.delete("x-frame-options");
+
+  return response;
 };
 
 export { handler };
