@@ -4,6 +4,34 @@ type TextItem<T1 extends string, T2 = string> = {
   "#text": string;
 };
 
+interface TrackInfoResponse {
+  track: {
+    name: string;
+    url: string;
+    duration: string;
+    streamable: TextItem<"fulltrack">;
+    listeners: string;
+    playcount: string;
+    artist: {
+      name: string;
+      mbid?: string;
+      url: string;
+    };
+    album?: {
+      artist: string;
+      title: string;
+      url: string;
+      image: TextItem<"size", "small" | "medium" | "large" | "extralarge">[];
+    };
+    toptags: {
+      tag: {
+        name: string;
+        url: string;
+      }[];
+    };
+  };
+}
+
 interface ResponseAttr {
   user: string;
   totalPages: string;
@@ -66,6 +94,27 @@ export interface TrackItem {
   image: string;
   url: string;
   nowplaying: boolean;
+}
+
+export async function getTrackInfo(
+  apiKey: string,
+  track: string,
+  artist: string
+) {
+  const url = new URL("https://ws.audioscrobbler.com/2.0/");
+  url.searchParams.set("method", "track.getinfo");
+  url.searchParams.set("track", track);
+  url.searchParams.set("artist", artist);
+  url.searchParams.set("api_key", apiKey);
+  url.searchParams.set("format", "json");
+
+  const response = await fetch(url);
+  if (!response.ok) {
+    return null;
+  }
+
+  const data = await response.json<TrackInfoResponse>();
+  return data.track;
 }
 
 export async function getRecentTracks(
