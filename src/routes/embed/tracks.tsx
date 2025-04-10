@@ -118,6 +118,35 @@ const handler: Handler<Env, "tracks"> = async (c) => {
           -webkit-user-drag: none;
         }
 
+        @media (max-width: 480px) {
+          .image-grid {
+            grid-template-columns: 40px 40px;
+            grid-template-rows: 40px 40px;
+          }
+
+          .embed-container {
+            padding: 0.75rem;
+            gap: 0.5rem;
+          }
+
+          h1 {
+            font-size: 0.9rem;
+            margin: 0 0 0.4rem 0;
+          }
+
+          .track-info h3 {
+            font-size: 0.8rem;
+          }
+
+          .track-info span {
+            font-size: 0.7rem;
+          }
+
+          .track-index {
+            font-size: 0.8rem;
+          }
+        }
+
         .content {
           display: flex;
           flex: 1;
