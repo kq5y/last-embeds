@@ -108,6 +108,7 @@ const handler: Handler<Env, "tracks"> = async (c) => {
           flex-shrink: 0;
           border-radius: 0.4rem;
           overflow: hidden;
+          height: fit-content;
         }
 
         .image-grid img {
@@ -116,35 +117,6 @@ const handler: Handler<Env, "tracks"> = async (c) => {
           object-fit: cover;
           user-select: none;
           -webkit-user-drag: none;
-        }
-
-        @media (max-width: 480px) {
-          .image-grid {
-            grid-template-columns: 40px 40px;
-            grid-template-rows: 40px 40px;
-          }
-
-          .embed-container {
-            padding: 0.75rem;
-            gap: 0.5rem;
-          }
-
-          h1 {
-            font-size: 0.9rem;
-            margin: 0 0 0.4rem 0;
-          }
-
-          .track-info h3 {
-            font-size: 0.8rem;
-          }
-
-          .track-info span {
-            font-size: 0.7rem;
-          }
-
-          .track-index {
-            font-size: 0.8rem;
-          }
         }
 
         .content {
@@ -211,18 +183,13 @@ const handler: Handler<Env, "tracks"> = async (c) => {
           font-size: 0.9rem;
           margin: 0;
           color: #fff;
-          flex: 1 1 60%;
           font-weight: normal;
         }
 
         .track-info span {
           font-size: 0.8rem;
           color: #aaa;
-          flex: 1 1 40%;
-        }
-
-        .track-info span:last-child {
-          flex: initial;
+          flex: 1 1 30%;
         }
 
         a {
@@ -236,6 +203,39 @@ const handler: Handler<Env, "tracks"> = async (c) => {
 
         .track-list li:hover {
           background-color: #3c3c3c;
+        }
+
+        @media (max-width: 480px) {
+          .image-grid {
+            grid-template-columns: 40px 40px;
+            grid-template-rows: 40px 40px;
+          }
+
+          .embed-container {
+            padding: 0.75rem;
+            gap: 0.5rem;
+          }
+
+          h1 {
+            font-size: 0.85rem;
+            margin: 0 0 0.4rem 0;
+          }
+
+          .track-list li {
+            grid-template-columns: 1.5rem 1fr;
+          }
+
+          .track-info h3 {
+            font-size: 0.75rem;
+          }
+
+          .track-info span {
+            font-size: 0.675rem;
+          }
+
+          .track-index {
+            font-size: 0.8rem;
+          }
         }
       `}
         </style>
@@ -263,13 +263,15 @@ const handler: Handler<Env, "tracks"> = async (c) => {
                         <h3>{track.name}</h3>
                       </a>
                       <span>{track.artist}</span>
-                      {type === "recently" &&
-                        (track as RecentTrackItem).nowplaying && (
-                          <span>Now Playing...</span>
+                      <div>
+                        {type === "recently" &&
+                          (track as RecentTrackItem).nowplaying && (
+                            <span>Now Playing...</span>
+                          )}
+                        {type === "frequently" && (
+                          <span>{(track as TopTrackItem).playcount} times</span>
                         )}
-                      {type === "frequently" && (
-                        <span>{(track as TopTrackItem).playcount} times</span>
-                      )}
+                      </div>
                     </div>
                   </li>
                 ))}
