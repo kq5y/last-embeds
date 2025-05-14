@@ -57,7 +57,7 @@ const handler: Handler<Env, "tracks"> = async (c) => {
           track.name,
           track.artist
         );
-        if (info?.album) {
+        if (info?.album?.image[1]["#text"]) {
           images.push(info.album.image[1]["#text"]);
         } else {
           images.push(
