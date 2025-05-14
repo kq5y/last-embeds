@@ -106,6 +106,8 @@ export async function getTrackInfo(
   track: string,
   artist: string
 ) {
+  const cache = await caches.open("lastfm-cache");
+
   const url = new URL("https://ws.audioscrobbler.com/2.0/");
   url.searchParams.set("method", "track.getinfo");
   url.searchParams.set("track", track);
@@ -113,10 +115,17 @@ export async function getTrackInfo(
   url.searchParams.set("api_key", apiKey);
   url.searchParams.set("format", "json");
 
+  const cachedResponse = await cache.match(url);
+  if (cachedResponse) {
+    const cachedData = await cachedResponse.json<TrackInfoResponse>();
+    return cachedData.track;
+  }
+
   const response = await fetch(url);
   if (!response.ok) {
     return null;
   }
+  await cache.put(url, response.clone());
 
   const data = await response.json<TrackInfoResponse>();
   return data.track;
