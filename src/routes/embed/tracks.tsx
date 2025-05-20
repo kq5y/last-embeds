@@ -149,7 +149,7 @@ const handler: Handler<Env, "tracks"> = async (c) => {
 
         .track-list li {
           display: grid;
-          grid-template-columns: 2rem 1fr;
+          grid-template-columns: 2rem 1fr auto;
           align-items: center;
           padding: 0.125rem;
           gap: 0.5rem;
@@ -169,7 +169,6 @@ const handler: Handler<Env, "tracks"> = async (c) => {
           align-items: center;
           gap: 0.5rem;
           overflow: hidden;
-          padding-right: 0.5rem;
         }
 
         .track-info h3,
@@ -190,6 +189,13 @@ const handler: Handler<Env, "tracks"> = async (c) => {
           font-size: 0.8rem;
           color: #aaa;
           flex: 1 1 30%;
+        }
+
+        .track-addition {
+          font-size: 0.8rem;
+          text-align: right;
+          color: #aaa;
+          padding-right: 0.5rem;
         }
 
         a {
@@ -222,7 +228,8 @@ const handler: Handler<Env, "tracks"> = async (c) => {
           }
 
           .track-list li {
-            grid-template-columns: 1.5rem 1fr;
+            grid-template-columns: 1.5rem 1fr auto;
+            gap: 0.375rem;
           }
 
           .track-info h3 {
@@ -235,6 +242,11 @@ const handler: Handler<Env, "tracks"> = async (c) => {
 
           .track-index {
             font-size: 0.8rem;
+          }
+          
+          .track-addition {
+            font-size: 0.675rem;
+            padding-right: 0.25rem;
           }
         }
       `}
@@ -263,16 +275,18 @@ const handler: Handler<Env, "tracks"> = async (c) => {
                         <h3>{track.name}</h3>
                       </a>
                       <span>{track.artist}</span>
-                      <div>
-                        {type === "recently" &&
-                          (track as RecentTrackItem).nowplaying && (
-                            <span>Now Playing...</span>
-                          )}
-                        {type === "frequently" && (
-                          <span>{(track as TopTrackItem).playcount} times</span>
-                        )}
-                      </div>
                     </div>
+                    {type === "recently" &&
+                      (track as RecentTrackItem).nowplaying && (
+                        <div className="track-addition">
+                          <span>Now Playing...</span>
+                        </div>
+                      )}
+                    {type === "frequently" && (
+                      <div className="track-addition">
+                        <span>{(track as TopTrackItem).playcount} times</span>
+                      </div>
+                    )}
                   </li>
                 ))}
               </ol>
