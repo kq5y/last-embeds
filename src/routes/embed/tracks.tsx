@@ -263,7 +263,7 @@ const handler: Handler<Env, "tracks"> = async (c) => {
             <div className="track-list">
               <ol>
                 {tracks.slice(0, 100).map((track, i) => (
-                  <li key={i}>
+                  <li key={i} title={`${track.name} - ${track.artist}`}>
                     <div className="track-index">{i + 1}</div>
                     <div className="track-info">
                       <a
