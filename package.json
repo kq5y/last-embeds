@@ -8,7 +8,7 @@
 		"check": "biome check --write"
 	},
 	"dependencies": {
-		"hono": "^4.7.9"
+		"hono": "^4.7.10"
 	},
 	"engines": {
 		"node": ">=20.0.0"
@@ -16,8 +16,8 @@
 	"packageManager": "pnpm@10.7.1",
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",
-		"@cloudflare/workers-types": "^4.20250514.0",
-		"wrangler": "^4.14.4"
+		"@cloudflare/workers-types": "^4.20250520.0",
+		"wrangler": "^4.16.0"
 	},
 	"pnpm": {
 		"onlyBuiltDependencies": [
