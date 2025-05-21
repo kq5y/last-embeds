@@ -2,8 +2,11 @@ import type { Handler } from "hono";
 import { Style, css } from "hono/css";
 
 import {
+  DEFAULT_IMAGE,
+  DEFAULT_IMAGE_KEY,
   type RecentTrackItem,
   type TopTrackItem,
+  getImageUrl,
   getRecentTracks,
   getTopTracks,
   getTrackInfo,
@@ -27,7 +30,10 @@ const handler: Handler<Env, "tracks"> = async (c) => {
 
   let tracks: RecentTrackItem[] | TopTrackItem[];
   let title: string;
-  let images: string[];
+  let images: {
+    m: string;
+    l: string;
+  }[];
 
   if (type === "recently") {
     tracks = (await getRecentTracks(
@@ -52,18 +58,22 @@ const handler: Handler<Env, "tracks"> = async (c) => {
 
     images = [];
     for (const track of tracks) {
-      if (track.image.includes("2a96cbd8b46e442fc41c2b86b821562f")) {
+      if (track.image.m.includes(DEFAULT_IMAGE_KEY)) {
         const info = await getTrackInfo(
           c.env.LASTFM_API_KEY,
           track.name,
           track.artist
         );
-        if (info?.album?.image[1]["#text"]) {
-          images.push(info.album.image[1]["#text"]);
+        if (info?.album?.image[0]["#text"]) {
+          images.push({
+            m: getImageUrl(info.album.image, "medium"),
+            l: getImageUrl(info.album.image, "large"),
+          });
         } else {
-          images.push(
-            "https://lastfm.freetls.fastly.net/i/u/174s/2a96cbd8b46e442fc41c2b86b821562f.png"
-          );
+          images.push({
+            m: DEFAULT_IMAGE.medium,
+            l: DEFAULT_IMAGE.large,
+          });
         }
       } else {
         images.push(track.image);
@@ -260,13 +270,15 @@ const handler: Handler<Env, "tracks"> = async (c) => {
         <div className="embed-container">
           <div className="image-grid">
             {images.map((image, i) => (
-              <img
-                key={i}
-                src={image}
-                alt="thumbnail"
-                loading="lazy"
-                decoding="async"
-              />
+              <picture key={i}>
+                <source media="(min-width: 480px)" srcSet={image.l} />
+                <img
+                  src={image.m}
+                  alt="thumbnail"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </picture>
             ))}
           </div>
           <div className="content">

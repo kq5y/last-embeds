@@ -4,6 +4,8 @@ type TextItem<T1 extends string, T2 = string> = {
   "#text": string;
 };
 
+type ImageSize = "small" | "medium" | "large" | "extralarge";
+
 interface TrackInfoResponse {
   track: {
     name: string;
@@ -21,7 +23,7 @@ interface TrackInfoResponse {
       artist: string;
       title: string;
       url: string;
-      image: TextItem<"size", "small" | "medium" | "large" | "extralarge">[];
+      image: TextItem<"size", ImageSize>[];
     };
     toptags: {
       tag: {
@@ -45,7 +47,7 @@ interface RecentTracksResponse {
     track: {
       artist: TextItem<"mbid">;
       streamable: string;
-      image: TextItem<"size", "small" | "medium" | "large" | "extralarge">[];
+      image: TextItem<"size", ImageSize>[];
       mbid: string;
       album: TextItem<"mbid">;
       name: string;
@@ -63,7 +65,7 @@ interface TopTracksResponse {
       streamable: TextItem<"fulltrack">;
       mbid: string;
       name: string;
-      image: TextItem<"size", "small" | "medium" | "large" | "extralarge">[];
+      image: TextItem<"size", ImageSize>[];
       artist: {
         url: string;
         name: string;
@@ -91,7 +93,10 @@ export function isPeriod(period: string): period is Period {
 interface TrackItemBase {
   name: string;
   artist: string;
-  image: string;
+  image: {
+    m: string;
+    l: string;
+  };
   url: string;
 }
 export interface RecentTrackItem extends TrackItemBase {
@@ -99,6 +104,27 @@ export interface RecentTrackItem extends TrackItemBase {
 }
 export interface TopTrackItem extends TrackItemBase {
   playcount: number;
+}
+
+export const DEFAULT_IMAGE_KEY = "2a96cbd8b46e442fc41c2b86b821562f";
+export const DEFAULT_IMAGE: {
+  [key in ImageSize]: string;
+} = {
+  small: `https://lastfm.freetls.fastly.net/i/u/34s/${DEFAULT_IMAGE_KEY}.png`,
+  medium: `https://lastfm.freetls.fastly.net/i/u/64s/${DEFAULT_IMAGE_KEY}.png`,
+  large: `https://lastfm.freetls.fastly.net/i/u/174s/${DEFAULT_IMAGE_KEY}.png`,
+  extralarge: `https://lastfm.freetls.fastly.net/i/u/300x300/${DEFAULT_IMAGE_KEY}.png`,
+};
+
+export function getImageUrl(
+  images: TextItem<"size", ImageSize>[],
+  size: ImageSize = "medium"
+) {
+  const image = images.find((img) => img.size === size);
+  if (image) {
+    return image["#text"];
+  }
+  return DEFAULT_IMAGE[size];
 }
 
 export async function getTrackInfo(
@@ -148,7 +174,10 @@ export async function getRecentTracks(
   return data.recenttracks.track.map((track) => ({
     name: track.name,
     artist: track.artist["#text"],
-    image: track.image[1]["#text"],
+    image: {
+      m: getImageUrl(track.image, "medium"),
+      l: getImageUrl(track.image, "large"),
+    },
     url: track.url,
     nowplaying: !!track["@attr"]?.nowplaying,
   }));
@@ -173,7 +202,10 @@ export async function getTopTracks(
   return data.toptracks.track.map((track) => ({
     name: track.name,
     artist: track.artist.name,
-    image: track.image[1]["#text"],
+    image: {
+      m: getImageUrl(track.image, "medium"),
+      l: getImageUrl(track.image, "large"),
+    },
     url: track.url,
     playcount: Number.parseInt(track.playcount),
   }));
