@@ -255,7 +255,13 @@ const handler: Handler<Env, "tracks"> = async (c) => {
         <div className="embed-container">
           <div className="image-grid">
             {images.map((image, i) => (
-              <img key={i} src={image} alt="thumbnail" />
+              <img
+                key={i}
+                src={image}
+                alt="thumbnail"
+                loading="lazy"
+                decoding="async"
+              />
             ))}
           </div>
           <div className="content">
