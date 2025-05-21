@@ -250,6 +250,11 @@ const handler: Handler<Env, "tracks"> = async (c) => {
             }
           }
         `}</Style>
+        <link
+          rel="preconnect"
+          href="https://lastfm.freetls.fastly.net"
+          crossorigin="anonymous"
+        />
       </head>
       <body>
         <div className="embed-container">
